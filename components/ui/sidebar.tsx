@@ -4,6 +4,7 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeftIcon } from "lucide-react"
+import Image from "next/image"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -339,7 +340,18 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
       data-sidebar="header"
       className={cn("flex flex-col gap-2 p-2", className)}
       {...props}
-    />
+    >
+      <div className="flex items-center  py-2">
+        <Image 
+          src="/logo.png" 
+          alt="Logo" 
+          width={150} 
+          height={40} 
+          className="h-auto w-auto"
+        />
+      </div>
+      {props.children}
+    </div>
   )
 }
 

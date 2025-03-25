@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from "recharts"
 
 import { dashboardData } from "@/app/dashboard/oasis-data"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -46,15 +46,11 @@ export interface OAChartAreaProps {
 const chartConfig = {
   approved: {
     label: "Approved",
-    color: "var(--success)",
+    color: "#01324b",
   },
   rejected: {
     label: "Rejected",
-    color: "var(--destructive)",
-  },
-  total: {
-    label: "Total",
-    color: "var(--primary)",
+    color: "#267E9E",
   },
 } satisfies ChartConfig
 
@@ -84,7 +80,7 @@ export function OAChartArea({
       // Store only month for display, but keep year for sorting
       const monthKey = date.toLocaleString('en-US', { month: 'short' })
       const monthYear = date.toLocaleString('en-US', { month: 'short', year: 'numeric' })
-      monthlyData.set(monthYear, { month: monthKey, approved: 0, rejected: 0, total: 0 })
+      monthlyData.set(monthYear, { month: monthKey, approved: 0, rejected: 0 })
     }
 
     // Process each article from the mock data
@@ -99,8 +95,7 @@ export function OAChartArea({
         .map(([monthYear, data]) => ({
           month: data.month,
           approved: Math.floor(Math.random() * 3) + 1,
-          rejected: Math.floor(Math.random() * 2),
-          total: Math.floor(Math.random() * 3) + 2
+          rejected: Math.floor(Math.random() * 2)
         }))
         .sort((a, b) => {
           const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -124,7 +119,7 @@ export function OAChartArea({
         
         // Initialize the month if it doesn't exist in our map
         if (!monthlyData.has(monthYear)) {
-          monthlyData.set(monthYear, { month: monthKey, approved: 0, rejected: 0, total: 0 })
+          monthlyData.set(monthYear, { month: monthKey, approved: 0, rejected: 0 })
         }
 
         const currentData = monthlyData.get(monthYear)
@@ -133,7 +128,6 @@ export function OAChartArea({
         } else if (article.ArticleStatus === "Rejected") {
           currentData.rejected++
         }
-        currentData.total++
         monthlyData.set(monthYear, currentData)
       } catch (error) {
         console.error("Error processing article:", error)
@@ -145,8 +139,7 @@ export function OAChartArea({
       .map(([monthYear, data]) => ({
         month: data.month,
         approved: data.approved,
-        rejected: data.rejected,
-        total: data.total
+        rejected: data.rejected
       }))
       .sort((a, b) => {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -202,24 +195,11 @@ export function OAChartArea({
       <CardContent className="pt-0">
         <div className="relative aspect-[2/1] w-full min-h-[200px]">
           <ChartContainer config={chartConfig}>
-            <AreaChart
+            <BarChart
               data={processArticleData}
               margin={{ top: 16, right: 16, bottom: 36, left: 36 }}
+              barGap={8}
             >
-              <defs>
-                <linearGradient id="approved" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={chartConfig.approved.color} stopOpacity={0.2}/>
-                  <stop offset="95%" stopColor={chartConfig.approved.color} stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="rejected" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={chartConfig.rejected.color} stopOpacity={0.2}/>
-                  <stop offset="95%" stopColor={chartConfig.rejected.color} stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="total" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={chartConfig.total.color} stopOpacity={0.2}/>
-                  <stop offset="95%" stopColor={chartConfig.total.color} stopOpacity={0}/>
-                </linearGradient>
-              </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis
                 dataKey="month"
@@ -243,40 +223,21 @@ export function OAChartArea({
                 }
               />
               <Legend verticalAlign="bottom" height={36} />
-              <Area
-                type="monotone"
+              <Bar
                 dataKey="approved"
-                fill="url(#approved)"
-                stroke={chartConfig.approved.color}
-                strokeWidth={2}
-                fillOpacity={1}
-                activeDot={{ r: 4 }}
+                fill={chartConfig.approved.color}
                 name={chartConfig.approved.label}
+                radius={[4, 4, 0, 0]}
                 isAnimationActive={false}
               />
-              <Area
-                type="monotone"
+              <Bar
                 dataKey="rejected"
-                fill="url(#rejected)"
-                stroke={chartConfig.rejected.color}
-                strokeWidth={2}
-                fillOpacity={1}
-                activeDot={{ r: 4 }}
+                fill={chartConfig.rejected.color}
                 name={chartConfig.rejected.label}
+                radius={[4, 4, 0, 0]}
                 isAnimationActive={false}
               />
-              <Area
-                type="monotone"
-                dataKey="total"
-                fill="url(#total)"
-                stroke={chartConfig.total.color}
-                strokeWidth={2}
-                fillOpacity={1}
-                activeDot={{ r: 4 }}
-                name={chartConfig.total.label}
-                isAnimationActive={false}
-              />
-            </AreaChart>
+            </BarChart>
           </ChartContainer>
         </div>
       </CardContent>
