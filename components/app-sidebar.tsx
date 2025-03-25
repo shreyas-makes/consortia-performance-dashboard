@@ -5,12 +5,7 @@ import {
   IconChartBar,
   IconDatabase,
   IconFileDescription,
-  IconFileWord,
-  IconInnerShadowTop,
   IconReport,
-  IconSearch,
-  IconSettings,
-  IconHelp,
 } from "@tabler/icons-react"
 
 import { NavGroup } from "@/components/nav-group"

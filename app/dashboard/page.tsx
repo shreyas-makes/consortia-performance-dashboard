@@ -66,8 +66,6 @@ export default function Page() {
               {/* Metrics Cards */}
               <div className="flex flex-col gap-6 md:gap-8">                
                 <OAMetricsCards
-                  dateRange={dateRange}
-                  articleType={articleType}
                   institution={institution}
                 />
               </div>
@@ -76,8 +74,6 @@ export default function Page() {
               <div className="flex flex-col gap-6 md:gap-8">
                 <h2 className="text-xl font-semibold px-4 md:px-0">Spending</h2>
                 <OASpendingCards
-                  dateRange={dateRange}
-                  articleType={articleType}
                   institution={institution}
                 />
               </div>
@@ -88,8 +84,6 @@ export default function Page() {
                 <div className="flex flex-col gap-2">
                   <h2 className="text-xl font-semibold px-4 md:px-0">Publication Trends</h2>
                   <OAChartArea
-                    dateRange={dateRange}
-                    articleType={articleType}
                     institution={institution}
                   />
                 </div>

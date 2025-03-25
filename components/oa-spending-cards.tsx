@@ -14,14 +14,10 @@ import {
 } from "@/components/ui/card"
 
 export interface OASpendingCardsProps {
-  dateRange: string
-  articleType: string
   institution: string
 }
 
 export function OASpendingCards({
-  dateRange,
-  articleType,
   institution,
 }: OASpendingCardsProps) {
   // Filter articles based on the selected institution

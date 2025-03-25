@@ -14,14 +14,10 @@ import {
 } from "@/components/ui/card"
 
 export interface OAMetricsCardsProps {
-  dateRange: string
-  articleType: string
   institution: string
 }
 
 export function OAMetricsCards({
-  dateRange,
-  articleType,
   institution,
 }: OAMetricsCardsProps) {
   // Filter articles based on the selected institution

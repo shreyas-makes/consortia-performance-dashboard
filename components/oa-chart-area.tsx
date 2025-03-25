@@ -1,10 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from "recharts"
 
 import { dashboardData } from "@/app/dashboard/oasis-data"
-import { useIsMobile } from "@/hooks/use-mobile"
 import {
   Card,
   CardAction,
@@ -31,15 +30,7 @@ import {
   ToggleGroupItem,
 } from "@/components/ui/toggle-group"
 
-interface Article {
-  allocationMonth: string;
-  articleStatus: "Approved" | "Rejected";
-  oaApprovalDate: string;
-}
-
 export interface OAChartAreaProps {
-  dateRange: string
-  articleType: string
   institution: string
 }
 
@@ -55,11 +46,8 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function OAChartArea({
-  dateRange,
-  articleType,
   institution,
 }: OAChartAreaProps) {
-  const isMobile = useIsMobile()
   const [viewRange, setViewRange] = React.useState("12m")
 
   // Process and format the data from dashboardData
@@ -79,8 +67,9 @@ export function OAChartArea({
       date.setMonth(currentDate.getMonth() - i)
       // Store only month for display, but keep year for sorting
       const monthKey = date.toLocaleString('en-US', { month: 'short' })
-      const monthYear = date.toLocaleString('en-US', { month: 'short', year: 'numeric' })
-      monthlyData.set(monthYear, { month: monthKey, approved: 0, rejected: 0 })
+      // We need this as the Map key, even though it's not directly used in the destructuring later
+      const dateKey = date.toLocaleString('en-US', { month: 'short', year: 'numeric' })
+      monthlyData.set(dateKey, { month: monthKey, approved: 0, rejected: 0 })
     }
     
     // Get articles from dashboardData and ensure it's an array
@@ -97,7 +86,9 @@ export function OAChartArea({
       
       // Return demo data for the last 12 months
       return Array.from(monthlyData.entries())
-        .map(([monthYear, data]) => ({
+        // We need the first param (key) for the entries() method to work,
+        // even though we only use data in the mapped result
+        .map(([, data]) => ({
           month: data.month,
           approved: Math.floor(Math.random() * 3) + 1,
           rejected: Math.floor(Math.random() * 2)
@@ -118,20 +109,21 @@ export function OAChartArea({
         const monthStr = article.allocationMonth.split('-')[0]
         
         // Use current year for simplicity
-        const monthYear = `${monthStr} ${new Date().getFullYear()}`
+        // We need this as the Map key, even though it's not directly used in the destructuring later
+        const dateKey = `${monthStr} ${new Date().getFullYear()}`
         
         // Initialize the month if it doesn't exist in our map
-        if (!monthlyData.has(monthYear)) {
-          monthlyData.set(monthYear, { month: monthStr, approved: 0, rejected: 0 })
+        if (!monthlyData.has(dateKey)) {
+          monthlyData.set(dateKey, { month: monthStr, approved: 0, rejected: 0 })
         }
 
-        const currentData = monthlyData.get(monthYear)
+        const currentData = monthlyData.get(dateKey)
         if (article.articleStatus === "Approved") {
           currentData.approved++
         } else if (article.articleStatus === "Rejected") {
           currentData.rejected++
         }
-        monthlyData.set(monthYear, currentData)
+        monthlyData.set(dateKey, currentData)
       } catch (error) {
         console.error("Error processing article:", error)
       }
@@ -139,7 +131,9 @@ export function OAChartArea({
 
     // Convert map to array and sort by date
     return Array.from(monthlyData.entries())
-      .map(([monthYear, data]) => ({
+      // We need the first param (key) for the entries() method to work,
+      // even though we only use data in the mapped result
+      .map(([, data]) => ({
         month: data.month,
         approved: data.approved,
         rejected: data.rejected
