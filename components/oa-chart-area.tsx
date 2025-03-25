@@ -119,15 +119,27 @@ export function OAChartArea({
           </Select>
         </CardAction>
       </CardHeader>
-      <CardContent>
-        <div className="h-[180px] w-full md:h-[220px]">
+      <CardContent className="pt-0">
+        <div className="relative aspect-[2/1] w-full min-h-[200px]">
           <ChartContainer config={chartConfig}>
             <AreaChart
               data={filteredChartData}
-              margin={{ top: 16, right: 16, bottom: 24, left: 0 }}
-              height={220}
-              width={500}
+              margin={{ top: 16, right: 16, bottom: 36, left: 36 }}
             >
+              <defs>
+                <linearGradient id="approved" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={chartConfig.approved.color} stopOpacity={0.2}/>
+                  <stop offset="95%" stopColor={chartConfig.approved.color} stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="rejected" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={chartConfig.rejected.color} stopOpacity={0.2}/>
+                  <stop offset="95%" stopColor={chartConfig.rejected.color} stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="total" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={chartConfig.total.color} stopOpacity={0.2}/>
+                  <stop offset="95%" stopColor={chartConfig.total.color} stopOpacity={0}/>
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis
                 dataKey="month"
@@ -135,9 +147,14 @@ export function OAChartArea({
                 axisLine={false}
                 tickMargin={8}
                 minTickGap={8}
-                tickFormatter={(value) => value}
+                height={30}
               />
-              <YAxis hide={true} />
+              <YAxis 
+                width={35}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+              />
               <ChartTooltip
                 content={
                   <ChartTooltipContent
@@ -145,36 +162,39 @@ export function OAChartArea({
                   />
                 }
               />
-              <Legend />
+              <Legend verticalAlign="bottom" height={36} />
               <Area
                 type="monotone"
                 dataKey="approved"
-                fill={chartConfig.approved.color}
+                fill="url(#approved)"
                 stroke={chartConfig.approved.color}
                 strokeWidth={2}
-                fillOpacity={0.1}
-                activeDot={{ r: 8 }}
+                fillOpacity={1}
+                activeDot={{ r: 4 }}
                 name={chartConfig.approved.label}
+                isAnimationActive={false}
               />
               <Area
                 type="monotone"
                 dataKey="rejected"
-                fill={chartConfig.rejected.color}
+                fill="url(#rejected)"
                 stroke={chartConfig.rejected.color}
                 strokeWidth={2}
-                fillOpacity={0.1}
-                activeDot={{ r: 8 }}
+                fillOpacity={1}
+                activeDot={{ r: 4 }}
                 name={chartConfig.rejected.label}
+                isAnimationActive={false}
               />
               <Area
                 type="monotone"
                 dataKey="total"
-                fill={chartConfig.total.color}
+                fill="url(#total)"
                 stroke={chartConfig.total.color}
                 strokeWidth={2}
-                fillOpacity={0.1}
-                activeDot={{ r: 8 }}
+                fillOpacity={1}
+                activeDot={{ r: 4 }}
                 name={chartConfig.total.label}
+                isAnimationActive={false}
               />
             </AreaChart>
           </ChartContainer>
