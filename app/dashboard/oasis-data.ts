@@ -990,6 +990,12 @@ export const getTotalSpendFor2024 = () => {
   }, 0);
 };
 
+// Calculate current spend for 2024 (what has been spent so far)
+export const getCurrentSpendFor2024 = () => {
+  // For the mock, we'll use 80% of the total as the current spend
+  return Math.floor(getTotalSpendFor2024() * 0.8);
+};
+
 // Get articles by month
 export const getArticlesByMonth = () => {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -1049,6 +1055,7 @@ export const dashboardData = {
   approvedArticles: getApprovedArticlesCount(),
   rejectedArticles: getRejectedArticlesCount(),
   totalSpend: getTotalSpendFor2024(),
+  currentSpend: getCurrentSpendFor2024(),
   articlesByMonth: getArticlesByMonth(),
   articlesByInstitution: getArticlesByInstitution(),
   institutions: getUniqueInstitutions()

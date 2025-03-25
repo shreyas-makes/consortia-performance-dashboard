@@ -51,12 +51,52 @@ export function OADataTable({
   // In a real implementation, we would filter the articles based on the filters
   // For this demo, we'll filter the institution if selected
   const filteredArticles = React.useMemo(() => {
-    if (institution === "all") return articles
+    let filtered = [...articles];
     
-    return articles.filter(
-      article => article.approvingInstitution === institution
-    )
-  }, [articles, institution])
+    // Filter by institution
+    if (institution !== "all") {
+      filtered = filtered.filter(
+        article => article.approvingInstitution === institution
+      );
+    }
+    
+    // Filter by article status
+    if (articleType !== "all") {
+      filtered = filtered.filter(
+        article => article.articleStatus === articleType
+      );
+    }
+    
+    // Filter by date range
+    if (dateRange !== "all") {
+      const now = new Date();
+      
+      if (dateRange === "2024") {
+        filtered = filtered.filter(article => {
+          const date = new Date(article.onlineDate);
+          return date.getFullYear() === 2024;
+        });
+      } else if (dateRange === "last6months") {
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(now.getMonth() - 6);
+        
+        filtered = filtered.filter(article => {
+          const date = new Date(article.onlineDate);
+          return date >= sixMonthsAgo;
+        });
+      } else if (dateRange === "last3months") {
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(now.getMonth() - 3);
+        
+        filtered = filtered.filter(article => {
+          const date = new Date(article.onlineDate);
+          return date >= threeMonthsAgo;
+        });
+      }
+    }
+    
+    return filtered;
+  }, [articles, institution, articleType, dateRange]);
 
   const columns: ColumnDef<Article>[] = [
     {
