@@ -969,29 +969,17 @@ export const articles: Article[] = [
 
 // Get total article count for the current year (2024)
 export const getTotalArticlesForCurrentYear = () => {
-  const currentYear = new Date().getFullYear();
-  return articles.filter(article => {
-    const articleYear = new Date(article.onlineDate).getFullYear();
-    return articleYear === currentYear;
-  }).length;
+  return articles.length;
 };
 
 // Get approved articles count for the current year
 export const getApprovedArticlesCount = () => {
-  const currentYear = new Date().getFullYear();
-  return articles.filter(article => {
-    const articleYear = new Date(article.onlineDate).getFullYear();
-    return articleYear === currentYear && article.articleStatus === "Approved";
-  }).length;
+  return articles.filter(article => article.articleStatus === "Approved").length;
 };
 
 // Get rejected articles count for the current year
 export const getRejectedArticlesCount = () => {
-  const currentYear = new Date().getFullYear();
-  return articles.filter(article => {
-    const articleYear = new Date(article.onlineDate).getFullYear();
-    return articleYear === currentYear && article.articleStatus === "Rejected";
-  }).length;
+  return articles.filter(article => article.articleStatus === "Rejected").length;
 };
 
 // Calculate total spend for 2024 (this is a placeholder since we don't have 2024 data)
