@@ -341,16 +341,9 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("flex flex-col gap-2 p-2", className)}
       {...props}
     >
-      <div className="flex items-center  py-2">
-        <Image 
-          src="/logo.png" 
-          alt="Logo" 
-          width={150} 
-          height={40} 
-          className="h-auto w-auto"
-        />
+      <div className="flex items-center py-2">
+        {props.children}
       </div>
-      {props.children}
     </div>
   )
 }
