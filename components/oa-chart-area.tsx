@@ -31,6 +31,11 @@ import {
   ToggleGroupItem,
 } from "@/components/ui/toggle-group"
 
+interface Article {
+  AllocationMonth: string;
+  ArticleStatus: "Approved" | "Rejected";
+}
+
 export interface OAChartAreaProps {
   dateRange: string
   articleType: string
@@ -60,20 +65,56 @@ export function OAChartArea({
   const isMobile = useIsMobile()
   const [viewRange, setViewRange] = React.useState("12m")
 
-  // Get the article data by month
-  const articlesByMonth = dashboardData.articlesByMonth
-  
-  // Format the data for the chart
-  const chartData = articlesByMonth.map(item => ({
-    month: item.month,
-    approved: item.approved,
-    rejected: item.rejected,
-    total: item.total
-  }))
+  // Process and format the data from dashboardData
+  const processArticleData = React.useMemo(() => {
+    // Create a map to store monthly counts
+    const monthlyData = new Map()
+    
+    // Get current date for filtering
+    const currentDate = new Date()
+    const monthsToShow = viewRange === "3m" ? 3 : viewRange === "6m" ? 6 : 12
+    const startDate = new Date(currentDate)
+    startDate.setMonth(currentDate.getMonth() - monthsToShow)
 
-  // Filter the chart data based on the view range
-  // For this demo, we'll just use all the data
-  const filteredChartData = chartData
+    // Initialize all months in the range with zero counts
+    for (let i = 0; i < monthsToShow; i++) {
+      const date = new Date(currentDate)
+      date.setMonth(currentDate.getMonth() - i)
+      const monthKey = date.toLocaleString('en-US', { month: 'short' })
+      monthlyData.set(monthKey, { approved: 0, rejected: 0, total: 0 })
+    }
+
+    // Process each article from the mock data
+    const articles = Array.isArray(dashboardData) ? dashboardData : []
+    articles.forEach((article: Article) => {
+      const allocationDate = new Date(article.AllocationMonth + "-01")
+      
+      // Skip if article is outside the selected range
+      if (allocationDate < startDate) return
+      
+      const monthKey = allocationDate.toLocaleString('en-US', { month: 'short' })
+      if (!monthlyData.has(monthKey)) return
+
+      const currentData = monthlyData.get(monthKey)
+      if (article.ArticleStatus === "Approved") {
+        currentData.approved++
+      } else if (article.ArticleStatus === "Rejected") {
+        currentData.rejected++
+      }
+      currentData.total++
+      monthlyData.set(monthKey, currentData)
+    })
+
+    // Convert map to array and sort by date
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    return Array.from(monthlyData.entries())
+      .map(([month, data]) => ({
+        month,
+        ...data
+      }))
+      .sort((a, b) => months.indexOf(a.month) - months.indexOf(b.month))
+      .reverse() // Show most recent months first
+  }, [viewRange])
 
   return (
     <Card className="@container/card">
@@ -89,7 +130,7 @@ export function OAChartArea({
           <ToggleGroup
             type="single"
             value={viewRange}
-            onValueChange={setViewRange}
+            onValueChange={(value) => value && setViewRange(value)}
             variant="outline"
             className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
           >
@@ -101,7 +142,7 @@ export function OAChartArea({
             <SelectTrigger
               className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
               size="sm"
-              aria-label="Select a value"
+              aria-label="Select time range"
             >
               <SelectValue placeholder="Last 12 months" />
             </SelectTrigger>
@@ -123,7 +164,7 @@ export function OAChartArea({
         <div className="relative aspect-[2/1] w-full min-h-[200px]">
           <ChartContainer config={chartConfig}>
             <AreaChart
-              data={filteredChartData}
+              data={processArticleData}
               margin={{ top: 16, right: 16, bottom: 36, left: 36 }}
             >
               <defs>
