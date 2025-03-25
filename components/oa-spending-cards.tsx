@@ -24,11 +24,19 @@ export function OASpendingCards({
   articleType,
   institution,
 }: OASpendingCardsProps) {
-  // Get the total spending data
-  const currentSpending = dashboardData.currentSpend
-  const projectedSpending = dashboardData.totalSpend
+  // Filter articles based on the selected institution
+  const filteredArticles = institution === "all" 
+    ? dashboardData.articles 
+    : dashboardData.articles.filter(article => article.approvingInstitution === institution)
   
-  // In a real implementation, we would filter based on the filters
+  // Calculate current and projected spending based on filtered articles
+  const totalSpend = filteredArticles.reduce((total, article) => {
+    return total + article.customerApcListPrice;
+  }, 0);
+  
+  // For the mock, we'll use 80% of the total as the current spend
+  const currentSpending = Math.floor(totalSpend * 0.8)
+  const projectedSpending = totalSpend
   
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2">

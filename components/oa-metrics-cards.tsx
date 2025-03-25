@@ -24,11 +24,15 @@ export function OAMetricsCards({
   articleType,
   institution,
 }: OAMetricsCardsProps) {
-  // In a real implementation, we would filter the metrics based on the filters
-  // For this demo, we'll just use the total values
-  const totalArticles = dashboardData.totalArticles
-  const approvedArticles = dashboardData.approvedArticles
-  const rejectedArticles = dashboardData.rejectedArticles
+  // Filter articles based on the selected institution
+  const filteredArticles = institution === "all" 
+    ? dashboardData.articles 
+    : dashboardData.articles.filter(article => article.approvingInstitution === institution)
+  
+  // Calculate metrics based on filtered articles
+  const totalArticles = filteredArticles.length
+  const approvedArticles = filteredArticles.filter(article => article.articleStatus === "Approved").length
+  const rejectedArticles = filteredArticles.filter(article => article.articleStatus === "Rejected").length
 
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-3">
@@ -72,7 +76,7 @@ export function OAMetricsCards({
             Articles approved for open access
           </div>
           <div className="text-muted-foreground">
-            {((approvedArticles / totalArticles) * 100).toFixed(1)}% of total submissions
+            {totalArticles > 0 ? ((approvedArticles / totalArticles) * 100).toFixed(1) : "0"}% of total submissions
           </div>
         </CardFooter>
       </Card>
@@ -94,7 +98,7 @@ export function OAMetricsCards({
             Articles rejected for open access
           </div>
           <div className="text-muted-foreground">
-            {((rejectedArticles / totalArticles) * 100).toFixed(1)}% of total submissions
+            {totalArticles > 0 ? ((rejectedArticles / totalArticles) * 100).toFixed(1) : "0"}% of total submissions
           </div>
         </CardFooter>
       </Card>

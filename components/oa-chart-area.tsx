@@ -32,8 +32,8 @@ import {
 } from "@/components/ui/toggle-group"
 
 interface Article {
-  AllocationMonth: string;
-  ArticleStatus: "Approved" | "Rejected";
+  allocationMonth: string;
+  articleStatus: "Approved" | "Rejected";
   oaApprovalDate: string;
 }
 
@@ -82,13 +82,18 @@ export function OAChartArea({
       const monthYear = date.toLocaleString('en-US', { month: 'short', year: 'numeric' })
       monthlyData.set(monthYear, { month: monthKey, approved: 0, rejected: 0 })
     }
-
-    // Process each article from the mock data
-    const articles = Array.isArray(dashboardData) ? dashboardData : []
     
-    // If we have no data, create some demo data
-    if (articles.length === 0) {
-      console.warn("No article data found, using demo data")
+    // Get articles from dashboardData and ensure it's an array
+    let articles = Array.isArray(dashboardData.articles) ? dashboardData.articles : []
+    
+    // Filter by institution if not "all"
+    if (institution !== "all") {
+      articles = articles.filter(article => article.approvingInstitution === institution)
+    }
+
+    // If no articles, use demo data
+    if (!articles || articles.length === 0) {
+      console.warn("No article data found after filtering, using demo data")
       
       // Return demo data for the last 12 months
       return Array.from(monthlyData.entries())
@@ -104,28 +109,26 @@ export function OAChartArea({
         .reverse()
     }
     
-    articles.forEach((article: any) => {
-      // Check if the article has oaApprovalDate
-      if (!article.oaApprovalDate) return
+    // Process each article
+    articles.forEach((article) => {
+      if (!article.allocationMonth) return
       
       try {
-        const approvalDate = new Date(article.oaApprovalDate)
+        // Extract month from allocationMonth format (e.g., "Sep-24")
+        const monthStr = article.allocationMonth.split('-')[0]
         
-        // Skip if article is outside the selected range
-        if (approvalDate < startDate) return
-        
-        const monthKey = approvalDate.toLocaleString('en-US', { month: 'short' })
-        const monthYear = approvalDate.toLocaleString('en-US', { month: 'short', year: 'numeric' })
+        // Use current year for simplicity
+        const monthYear = `${monthStr} ${new Date().getFullYear()}`
         
         // Initialize the month if it doesn't exist in our map
         if (!monthlyData.has(monthYear)) {
-          monthlyData.set(monthYear, { month: monthKey, approved: 0, rejected: 0 })
+          monthlyData.set(monthYear, { month: monthStr, approved: 0, rejected: 0 })
         }
 
         const currentData = monthlyData.get(monthYear)
-        if (article.ArticleStatus === "Approved") {
+        if (article.articleStatus === "Approved") {
           currentData.approved++
-        } else if (article.ArticleStatus === "Rejected") {
+        } else if (article.articleStatus === "Rejected") {
           currentData.rejected++
         }
         monthlyData.set(monthYear, currentData)
@@ -146,7 +149,7 @@ export function OAChartArea({
         return months.indexOf(a.month) - months.indexOf(b.month)
       })
       .reverse() // Most recent months first
-  }, [viewRange])
+  }, [viewRange, institution])  // Added institution as a dependency
 
   return (
     <Card className="@container/card">

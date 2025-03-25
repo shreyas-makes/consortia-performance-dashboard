@@ -53,11 +53,7 @@ const data = {
       url: "#",
       icon: IconReport,
     },
-    {
-      title: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
-    },
+    // Removed as per instructions
   ],
 }
 
